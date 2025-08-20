@@ -2,7 +2,7 @@
 
 >[**🇺🇸 English README**](README.md) | [**🇨🇳 中文版**](README_CN.md)
 
-本项目是在**Verilog-Eval基准框架**基础上**修改和增强**而来，专门用于评估大语言模型（LLM）的SpinalHDL代码生成能力。Verilog-Eval专注于Verilog RTL生成，而本项目将其扩展到SpinalHDL——一种基于Scala的强大硬件描述语言，通过先进的软件工程技术实现复杂的数字电路设计。
+本项目是在**Verilog-Eval基准框架(https://github.com/NVlabs/verilog-eval)**基础上**修改和增强**而来，专门用于评估大语言模型（LLM）的SpinalHDL代码生成能力。Verilog-Eval专注于Verilog RTL生成，而本项目将其扩展到SpinalHDL——一种基于Scala的强大硬件描述语言，通过先进的软件工程技术实现复杂的数字电路设计。
 
 项目继承了Verilog-Eval基准的156个综合设计问题，但对它们进行了适配，使其适用于SpinalHDL代码生成，为使用SpinalHDL的Scala-based HDL方法进行硬件设计的大模型性能评估提供系统化的基准框架。
 

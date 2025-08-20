@@ -1,10 +1,10 @@
 # SpinalHDL-Eval: Large Language Model SpinalHDL Code Generation Evaluation Benchmark
 
->This is a **modified and enhanced version** of the **Verilog-Eval benchmark framework**, specifically adapted to evaluate SpinalHDL code generation capabilities of large language models (LLMs). While Verilog-Eval focuses on Verilog RTL generation, this project extends the evaluation to SpinalHDL - a powerful hardware description language embedded in Scala that enables sophisticated digital circuit design through advanced software engineering techniques.
+>This is a **modified and enhanced version** of the **Verilog-Eval benchmark framework(https://github.com/NVlabs/verilog-eval)**, specifically adapted to evaluate SpinalHDL code generation capabilities of large language models (LLMs). While Verilog-Eval focuses on Verilog RTL generation, this project extends the evaluation to SpinalHDL - a powerful hardware description language embedded in Scala that enables sophisticated digital circuit design through advanced software engineering techniques.
 
 [**🇨🇳 中文文档**](README_CN.md) | [**🇺🇸 English README**](README.md)
 
-Originally based on NVIDIA's Verilog-Eval benchmark, this project maintains the same 156 comprehensive design problems but adapts them for SpinalHDL code generation, providing a systematic evaluation framework for assessing LLM performance in generating hardware designs using SpinalHDL's Scala-based HDL approach.
+Originally based on Verilog-Eval benchmark, this project maintains the same 156 comprehensive design problems but adapts them for SpinalHDL code generation, providing a systematic evaluation framework for assessing LLM performance in generating hardware designs using SpinalHDL's Scala-based HDL approach.
 
 ## Project Structure
 
@@ -161,7 +161,7 @@ The project uses SBT (Scala Build Tool) for managing the SpinalHDL compilation p
 
 ## Usage
 
-### 环境准备
+### Prepare the environment
 ```bash
 # set OpenRouter API key
 export OPENROUTER_API_KEY="your-api-key"

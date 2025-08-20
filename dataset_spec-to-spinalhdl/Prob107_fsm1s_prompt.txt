@@ -1,0 +1,19 @@
+
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  clk
+ - input  reset
+ - input  din
+ - output dout
+
+Implement the following Moore state machine with two states, one input,
+and one output. The reset state is B and reset is active-high
+synchronous.
+
+  B (dout=1) --din=0--> A
+  B (dout=1) --din=1--> B
+  A (dout=0) --din=0--> B
+  A (dout=0) --din=1--> A
+

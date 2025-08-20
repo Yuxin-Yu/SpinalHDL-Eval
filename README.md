@@ -1,240 +1,244 @@
-# SpinalHDL-Eval: Large Language Model SpinalHDL Code Generation Evaluation Benchmark
+# SpinalHDL-Eval: LLM SpinalHDL Code Generation Capability Benchmark (based on Verilog-Eval)
 
->This is a **modified and enhanced version** of the **Verilog-Eval benchmark framework(https://github.com/NVlabs/verilog-eval)**, specifically adapted to evaluate SpinalHDL code generation capabilities of large language models (LLMs). While Verilog-Eval focuses on Verilog RTL generation, this project extends the evaluation to SpinalHDL - a powerful hardware description language embedded in Scala that enables sophisticated digital circuit design through advanced software engineering techniques.
+>[**🇨🇳 Chinese README**](README_CN.md) | [**🇺🇸 English README**](README.md)
 
-[**🇨🇳 中文文档**](README_CN.md) | [**🇺🇸 English README**](README.md)
+This project is a modified and enhanced version of the Verilog-Eval benchmark framework (`https://github.com/NVlabs/verilog-eval`), specifically designed to evaluate large language models' (LLMs) ability to generate SpinalHDL code. While Verilog-Eval focuses on Verilog RTL generation, this project extends it to SpinalHDL — a powerful Scala-based hardware description language that enables complex digital circuit design through advanced software engineering techniques.
 
-Originally based on Verilog-Eval benchmark, this project maintains the same 156 comprehensive design problems but adapts them for SpinalHDL code generation, providing a systematic evaluation framework for assessing LLM performance in generating hardware designs using SpinalHDL's Scala-based HDL approach.
+The project inherits the 156 comprehensive design problems from Verilog-Eval and adapts them for SpinalHDL code generation, providing a systematic benchmark framework for evaluating model performance when using SpinalHDL's Scala-based HDL approach.
 
-## Project Structure
+## 🚀 Project Overview
+
+This project includes two core components:
+1. SpinalHDL-Eval benchmark: a rigorous evaluation framework with 156 diverse hardware design problems
+2. Context7 MCP enhancement framework: an n8n-based automated system for SpinalHDL code generation with LLMs
+
+## 📂 Project Structure
 
 ```
 .
 ├── build.sbt                 # SBT build configuration for Scala/SpinalHDL
 ├── Makefile.in               # Build configuration template
-├── dataset_spec-to-spinalhdl # Comprehensive dataset with 156 design problems
+├── dataset_spec-to-spinalhdl # Dataset containing 156 design problems
 ├── hw/                       # Hardware source files directory
 ├── n8n/                      # Context7 MCP automation framework
-│   └── SpinalHDL-Eval-MCP.json  # n8n workflow for automated SpinalHDL generation
+│   └── SpinalHDL-Eval-MCP.json  # n8n workflow configuration
 ├── openrouter/               # OpenRouter LLM integration scripts
 ├── project/                  # SBT project configuration
 ├── scripts/                  # Advanced LLM integration and code generation scripts
-└── README.md                 # This file
+└── README.md                 # English documentation (this file)
+└── README_CN.md              # Chinese documentation
 ```
 
-## Key Components
+## 🔧 Core Components
 
 ### 1. Comprehensive Evaluation Dataset (`dataset_spec-to-spinalhdl/`)
-The benchmark features a rich dataset of **156 diverse hardware design problems** spanning across multiple complexity levels and application domains. Each problem includes:
 
-- **`_prompt.txt`**: Detailed natural language specification describing the desired hardware functionality
-- **`_ref.sv`**: Reference Verilog implementation for correctness verification  
-- **`_test.sv`**: Comprehensive testbench with validation scenarios
+The benchmark includes 156 diverse hardware design problems across multiple complexity levels and domains. Each problem contains:
 
-#### Design Categories
-The problems cover a wide spectrum of digital design concepts:
+- `_prompt.txt`: Detailed natural language specification describing the desired hardware functionality
+- `_ref.sv`: Reference Verilog implementation for correctness verification
+- `_test.sv`: Comprehensive testbench with validation scenarios
 
-**🔢 Basic Logic (Problems 001-030)**
-- Simple gates (AND, OR, NOT, XOR implementations)
-- Multiplexers and demultiplexers  
-- Basic arithmetic circuits
-- Signal routing and buffering
+#### 🎯 Adaptations for SpinalHDL
+To enable SpinalHDL code generation and evaluation, we systematically adapted the prompts, focusing on prompt design and adding the SpinalHDL-to-Verilog flow.
 
-**⚙️ Sequential Circuits (Problems 031-060)**  
-- Flip-flops and registers (DFF, TFF, JKFF)
-- Counters (up/down, BCD, Johnson)
-- Shift registers and barrel shifters
-- Edge detection circuits
+##### Prompt Adaptation
 
-**🧮 Advanced Arithmetic (Problems 061-090)**
-- ALU designs and arithmetic units
-- Multipliers and dividers
-- Adders and subtractors with various architectures
-- Digital filters and signal processing
+###### System Prompt Optimization
+- Role alignment: Adjusted the LLM's role and output style to better fit SpinalHDL code generation
+- Code template introduction: Added the following template structure, significantly improving the success rate of converting SpinalHDL code to Verilog later
+``` java
+You are a SpinalHDL RTL designer that only writes code using correct SpinalHDL syntax(base spinalHDL 1.12.0 version).Response use follow pattern:
 
-**🔄 State Machines (Problems 091-120)**
-- Finite state machines (FSM) - Moore and Mealy types
-- Protocol implementers (PS2, HDLC, serial communication)
-- Traffic light controllers and sequence detectors
-- One-hot encoded FSMs
+import spinal.core._
+import spinal.lib._
 
-**🔬 Complex Systems (Problems 121-156)**
-- Conway's Game of Life cellular automaton
-- Rule 90/110 cellular automata
-- Linear feedback shift registers (LFSR)
-- G-share branch predictors
-- Historical sequence tracking systems
+// Hardware definition
+case class TopModule() extends Component {
+  
+}
 
-#### Problem Naming Convention
-Problems are systematically numbered (Prob001 through Prob156) with descriptive names:
-- `Prob001_zero`: Simple signal assignment
-- `Prob018_mux256to1`: 256-to-1 multiplexer  
-- `Prob144_conwaylife`: Conway's Game of Life implementation
-- `Prob079_fsm3onehot`: FSM with one-hot encoding
+object TopMain {
+  def main(args: Array[String]) {
+    SpinalVerilog(new TopModule)
+  }
+}
+
+```
+
+###### Test Case Adaptation
+- Keyword conflict resolution: Renamed the original Verilog-Eval testbench signals — input `in` to `din`, output `out` to `dout` — to avoid conflicts with SpinalHDL keywords
+- Testbench synchronization: Updated the testbench signal names accordingly to ensure consistency
+
+##### SpinalHDL to Verilog
+See the next section for details
 
 ### 2. Code Generation Scripts (`scripts/`)
-Advanced LLM integration tools with comprehensive model support:
 
-#### Core Generation Tool (`sv-generate`)
-A sophisticated Python-based LLM integration tool supporting:
+#### spinalhdl-to-sv script
+Based on the official SpinalHDL 1.12.0 project [SpinalTemplateSbt](`https://github.com/SpinalHDL/SpinalTemplateSbt`).
 
-**🤖 Model Support**
-- **OpenAI**: GPT-3.5-turbo, GPT-4, GPT-4-turbo, GPT-4o
-- **NVIDIA NIM**: Llama-3.1 series (8B, 70B, 405B), CodeLlama, Mistral models
-- **OpenRouter**: DeepSeek, Qwen, Gemini, Claude, and free-tier models
+##### Conversion Flow
+1. Code preprocessing
+   - Copy SpinalHDL code from the LLM output directory to a temporary `hw` directory
+   - Add package name
+   - Check whether the `TopMain` target exists
 
-**⚙️ Task Types**
-- `spec-to-spinalhdl`: **Direct SpinalHDL generation** from natural language
+2. Code generation
+   - Use SBT commands to generate Verilog code
+   - Record execution status in real time
 
-**🛠️ Advanced Features**
-- Temperature control (0.1-1.0) for deterministic vs creative generation
-- Few-shot learning with 1-4 contextual examples
-- Repeat generation with error analysis
-- Verbose debugging mode for detailed inspection
+3. Result handling
+   - Success: Rename and copy the generated Verilog code to the target directory
+   - Failure: Proceed directly to the next conversion task
 
-- `spinalhdl-to-sv.py`: Automated SpinalHDL to Verilog compilation   
-- `count_failures.py`: Comprehensive evaluation metrics
-- `pass_rate_to_csv.py`: CSV report generation
+4. Batch processing
+   - Iterate through all files to be converted
+   - Collect and output a final summary of all conversion tasks
+
+##### Environment Requirements
+- SpinalHDL development environment
+- SBT and Scala dependencies
+- Java runtime environment
+
+##### Notes
+- Ensure the `TopMain` target is correctly defined in the code
+- Verify the generated code's package configuration
+- Temporary files are created during conversion; monitor disk space
 
 ### 3. Context7 MCP Framework (`n8n/`)
-The **Context7 MCP Framework** represents a breakthrough in automated hardware design generation, providing an n8n-based workflow for systematic SpinalHDL code generation using cutting-edge LLMs.
 
-#### Architecture Overview
+The Context7 MCP framework represents a breakthrough in automated hardware design, providing an n8n-based workflow for systematic SpinalHDL code generation using cutting-edge LLMs.
+
+#### 🏗️ Architecture Overview
 ```
-Workflow Process:
+Workflow:
 [Manual Trigger] → [File Processing] → [Context Enhancement] → [LLM Generation] → [Code Extraction] → [Output Management]
 ```
 
-#### Key Components (`SpinalHDL-Eval-MCP.json`)
+#### 🔑 Key Components (`SpinalHDL-Eval-MCP.json`)
 
-**🔍 Input Processing**
-- **File Reader**: Processes all 156 prompt files sequentially
-- **Directory Structure**: Creates organized output directories (`output/ProbXXX_problem_name/`)
-- **Path Resolution**: Automatic handling of file paths and naming conventions
+**Input Processing**
+- File reader: Sequentially processes all 156 prompt files
+- Directory structure: Creates organized output directories (`output/ProbXXX_problem_name/`)
+- Path resolution: Automatic handling of file paths and naming conventions
 
-**🧠 LLM Enhancement**
-- **Context7 Integration**: Injects SpinalHDL documentation via MCP protocol
-- **Prompt Optimization**: Automatically appends context7 tool hints for improved accuracy
-- **Model Flexibility**: Configurable for any OpenRouter-supported model
+**LLM Enhancement**
+- Context7 integration: Injects SpinalHDL documentation via the MCP protocol
+- Prompt optimization: Automatically appends context7 tool hints to improve accuracy
+- Model flexibility: Configurable for any OpenRouter-supported model
 
-**⚡ Generation Pipeline**
-- **Parallel Processing**: Efficient batch generation across problems
-- **Error Handling**: Robust error recovery and retry mechanisms
-- **Format Validation**: Automatic extraction of SpinalHDL code from LLM responses
-- **Logging**: Comprehensive generation logs for debugging and analysis
+**Generation Pipeline**
+- Parallel processing: Efficient batch generation across problems
+- Error handling: Robust error recovery and retry mechanisms
+- Format validation: Automatically extracts SpinalHDL code from LLM responses
+- Logging: Comprehensive generation logs for debugging and analysis
 
-**📂 Output Management**
-- **Organized Storage**: Each problem gets dedicated directory with results
-- **Dual Format Output**: 
+**Output Management**
+- Organized storage: Each problem has a dedicated directory with results
+- Dual-format output:
   - `sample01.scala`: Generated SpinalHDL implementation
   - `log01.log`: Detailed generation log and metadata
-- **Batch Summary**: Aggregate results across all problems
+- Batch summary: Aggregate results across all problems
 
-#### Usage Workflow
+## 🚀 Quick Start
+
+### Environment Setup
 ```bash
-# Load workflow into n8n
-n8n import:workflow --input=n8n/SpinalHDL-Eval-MCP.json
-
-# Configure credentials
-# 1. OpenRouter API key integration
-# 2. Context7 MCP server setup
-# 3. Docker volume mapping for file access
-
-# Execute comprehensive evaluation
-# Workflow runs automatically processing all 156 problems
-```
-
-### 3. Build System
-The project uses SBT (Scala Build Tool) for managing the SpinalHDL compilation process:
-- `build.sbt`: Defines project dependencies and settings
-- Uses SpinalHDL version 1.12.0
-
-## Workflow
-
-1. **Specification**: Natural language problem descriptions are stored in the dataset directory.
-
-2. **Code Generation**: The `sv-generate` script prompts an LLM to generate SpinalHDL code from the natural language specification.
-
-3. **Compilation**: Generated SpinalHDL code is compiled to Verilog using the SpinalHDL compiler via the `spinalhdl-to-sv.py` script.
-
-4. **Testing**: Generated Verilog is tested against reference implementations using the provided testbenches.
-
-## Usage
-
-### Prepare the environment
-```bash
-# set OpenRouter API key
+# Set OpenRouter API key
 export OPENROUTER_API_KEY="your-api-key"
 ```
 
-### Generating SpinalHDL Code
+### Manual Evaluation Examples
+
+#### Generate code for a single problem
 ```bash
-# Generate SpinalHDL code for a specific problem using an LLM
-./scripts/sv-generate --model gpt-4 --language spinalhdl \
+# Use a specified model to test a concrete problem
+./scripts/sv-generate --model gpt-4o \
+  --language spinalhdl \
   --task spec-to-rtl \
   --output generated.scala \
-  dataset_spec-to-spinalhdl/Prob001_zero_prompt.txt
+  dataset_spec-to-spinalhdl/Prob144_conwaylife_prompt.txt
 
-# Generate SpinalHDL code for all problem using an LLM
+# Use the default model to test all problems
 cd build
 make sv-generate LANGUAGE=spinalhdl
-
 ```
 
-### Converting SpinalHDL to Verilog
+#### Compile the generated code
 ```bash
-# Convert generated SpinalHDL to Verilog
+# Use the automatic conversion script
 python3 ./scripts/spinalhdl-to-sv.py -s ./build -t hw -sbt .
 ```
 
-### Test the Verilog code
+### Test the generated Verilog code
 ```bash
 cd build
 make sv-iv-test
 ```
 
-### Analyze the Verilog code
+### Analyze the generated Verilog code
 ```bash
 cd build
 make sv-iv-analyze
 ```
 
-### Building with SBT
+### Context7 MCP Automated Evaluation
+
+#### Workflow Setup
 ```bash
-# Compile SpinalHDL code to Verilog
-sbt "runMain <package>.<module>.TopMain"
+# 1. Install and start n8n (assumes Docker is installed)
+docker run -it --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
+
+# 2. Load the workflow
+n8n import:workflow --input=n8n/SpinalHDL-Eval-MCP.json
+
+# 3. Configure credentials
+# Visit http://localhost:5678 in your browser
+# Configure: OpenRouter API key and Context7 MCP server
+
+# 4. Run the evaluation
+# Trigger manually or via API
 ```
 
-## Dependencies
+#### Batch Processing Example
+```bash
+# Generate SpinalHDL code for all problems
+bash build/Makefile.in sv-generate LANGUAGE=spinalhdl
 
-- Scala 2.13.14
-- SpinalHDL 1.12.0
-- Python 3.x with required packages (requests, tqdm)
-- SBT (Scala Build Tool)
+# Analyze results
+python3 count_failures.py results/
+python3 pass_rate_to_csv.py --directory results/ --format detailed
+```
 
-## Model Support
+## 📊 Evaluation Metrics
 
-The project supports various LLMs through different APIs:
+### ✅ Success Criteria
+The project provides comprehensive evaluation metrics:
 
-- OpenAI models (gpt-3.5-turbo, gpt-4, etc.)
-- NVIDIA NIM models (Llama, CodeLlama, Mistral, etc.)
-- OpenRouter models (including DeepSeek, Qwen, Gemini, Claude, etc.)
+**Syntax correctness rate**: Success rate of SpinalHDL-to-Verilog conversion, calculated as the number of successful conversions divided by total attempts based on `spinalhdl2sv-summary.txt`.
 
-## Evaluation Metrics
+**Functional pass rate**: Testbench pass rate obtained by running `make sv-iv-analyze`.
 
-The project includes scripts for analyzing the success rate of code generation:
-- `count_failures.py`: Counts failed generations
-- `pass_rate_to_csv.py`: Calculates and exports pass rates to CSV
+## 🔧 Dependencies
 
-## Contributing
+### Core Dependencies
+- Scala: 2.13.14 (production-grade build)
+- SpinalHDL: 1.12.0 (latest stable)
+- SBT: 1.9.x+ (Scala build tool)
+- Python: 3.8+ with standard scientific stack
+- Java: OpenJDK 11+ (runtime compatibility)
 
-To contribute to this project:
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a pull request
+### LLM Integration Dependencies
+- langchain: Advanced LLM orchestration
+- langchain-openai: OpenAI API integration
+- requests: HTTP client for API interaction
+- pandas: Data analysis and evaluation metrics
+- tqdm: Progress bars for batch processing
 
-## License
+## 🌐 Related Links
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- [Chinese README](README_CN.md) — Full Chinese documentation
+- [Verilog-Eval Project](https://github.com/NVlabs/verilog-eval) — Original Verilog benchmark
+- [SpinalHDL Documentation](https://spinalhdl.github.io/SpinalDoc-RTD/) — Official SpinalHDL docs
+- [Context7 MCP](https://github.com/context7/mcp) — Context7 MCP protocol

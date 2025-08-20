@@ -2,7 +2,7 @@
 
 >[**🇨🇳 Chinese README**](README_CN.md) | [**🇺🇸 English README**](README.md)
 
-This project is a modified and enhanced version of the Verilog-Eval benchmark framework (`https://github.com/NVlabs/verilog-eval`), specifically designed to evaluate large language models' (LLMs) ability to generate SpinalHDL code. While Verilog-Eval focuses on Verilog RTL generation, this project extends it to SpinalHDL — a powerful Scala-based hardware description language that enables complex digital circuit design through advanced software engineering techniques.
+This project is a modified and enhanced version of the [Verilog-Eval](https://github.com/NVlabs/verilog-eval) benchmark framework , specifically designed to evaluate large language models' (LLMs) ability to generate SpinalHDL code. While Verilog-Eval focuses on Verilog RTL generation, this project extends it to SpinalHDL — a powerful Scala-based hardware description language that enables complex digital circuit design through advanced software engineering techniques.
 
 The project inherits the 156 comprehensive design problems from Verilog-Eval and adapts them for SpinalHDL code generation, providing a systematic benchmark framework for evaluating model performance when using SpinalHDL's Scala-based HDL approach.
 

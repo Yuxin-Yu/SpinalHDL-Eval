@@ -1,0 +1,534 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "You are a SpinalHDL RTL designer that only writes code using correct Spinalhdl syntax.Enclose your code with [BEGIN] and [DONE].Only output the code snippet and do NOT output anything else.use follow pattern:\n```\nimport spinal.core._\nimport spinal.lib._\n\n// Hardware definition\ncase class TopModule() extends Component {\n  \n}\n\nobject TopMain {\n  def main(args: Array[String]) {\n    SpinalVerilog(new TopModule)\n  }\n}\n\n```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        840
+      ],
+      "id": "dae64cb2-b036-4a0f-8ffd-bcdeaf8420cb",
+      "name": "AI Agent",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        1000
+      ],
+      "id": "9149dc7c-991b-4473-b01f-f615fbe245f5",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "UXa3OJw3iYoT5SMu",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "binaryPropertyName": "=data",
+        "options": {
+          "fileName": "={{ $('Read Prompt Files').item.json.fileName.replace(/prompt\\.txt$/, 'sample01.scala')  }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2960,
+        760
+      ],
+      "id": "095a352b-d03e-4eb5-99e8-e14f048d09cd",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "## 输入获取与处理 ",
+        "height": 420,
+        "width": 1080
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1100,
+        720
+      ],
+      "typeVersion": 1,
+      "id": "a5b622c9-d065-489d-8db4-baac81f270c9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2020,
+        940
+      ],
+      "id": "7f635a5d-a366-4178-aeee-299463bffde4",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=mkdir -p /files/output/{{$('Read Prompt Files').item.json.fileName.slice(0,-11)}}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        860
+      ],
+      "id": "8870b099-150a-49be-8f52-00333b407e0b",
+      "name": "create fold",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/dataset_spec-to-spinalhdl/Prob*.txt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        940
+      ],
+      "id": "ff151fc4-4689-4094-83f9-68bf74379f10",
+      "name": "Read Prompt Files"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        940
+      ],
+      "id": "66573ce7-be6f-4ad5-8000-9d237588c07c",
+      "name": "Execute workflow"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        940
+      ],
+      "id": "965ce5a4-44e8-48e3-8479-75ba5e19ceb4",
+      "name": "Extract Prompt from File"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "=output",
+        "binaryPropertyName": "=data",
+        "options": {
+          "fileName": "={{ $('Read Prompt Files').item.json.fileName.replace(/prompt\\.txt$/, 'log01.log')  }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2820,
+        920
+      ],
+      "id": "db1964a9-a18c-48af-b4c9-249c74643664",
+      "name": "Edit log"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3320,
+        900
+      ],
+      "id": "20335666-f5c0-443b-babf-ea83884feecb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1640,
+        940
+      ],
+      "id": "e1491c35-7fd6-4973-89c2-685b4534de4d",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/output/{{$('Read Prompt Files').item.json.fileName.slice(0,-11)}}/{{$('Edit log').item.binary.data.fileName}}",
+        "dataPropertyName": "=data",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        920
+      ],
+      "id": "8f00494d-29da-47c5-98e2-0d96bb08c80f",
+      "name": "Write Log Files to Disk1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/output/{{$('Read Prompt Files').item.json.fileName.slice(0,-11)}}/{{$('Convert to File').item.binary.data.fileName}}",
+        "dataPropertyName": "=data",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        760
+      ],
+      "id": "fd8b63b0-f519-4f1c-97d5-d455a3d7f730",
+      "name": "Write Scala Files to Disk"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const text = item.json.output || '';\n  \n  // 尝试匹配 [BEGIN] 和 [DONE] 之间的内容\n  // const beginDoneRegex = /\\[BEGIN\\]\\s*([\\s\\S]*?)\\s*\\[DONE\\]/;\n  // const beginDoneMatch = text.match(beginDoneRegex);\n  \n  // if (beginDoneMatch) {\n  //   // 成功匹配：提取中间内容并去除首尾空白\n  //   item.json.output = beginDoneMatch[1].trim();\n  // } else {\n    // 匹配失败：尝试匹配 SpinalHDL 完整代码块\n    const spinalRegex = /(import spinal\\.core\\._[\\s\\S]*?object TopMain\\s*\\{[\\s\\S]*?\\}\\s*\\})/;\n    const spinalMatch = text.match(spinalRegex);\n    \n    if (spinalMatch) {\n      // 成功匹配：返回包含标记的完整代码块\n      item.json.output = spinalMatch[1].trim();\n    } else {\n      // 双重匹配失败：返回空字符串\n      item.json.output = '';\n    }\n  // }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2820,
+        760
+      ],
+      "id": "b6973dae-4b84-4704-aae4-6a97b5a523be",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8c8d3eef-b4d8-4d82-aeb1-4bce092e7eb7",
+              "name": "=output",
+              "value": "={{ $json.data +\"Must choose context7 tool.Use context7.\"}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2240,
+        840
+      ],
+      "id": "358a9310-ffaa-4607-aae4-3444d552bdba",
+      "name": "Edit Prompt1"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use MCP client.Use context7",
+        "connectionType": "sse",
+        "operation": "executeTool",
+        "toolName": "=get-library-docs",
+        "toolParameters": "={\n\"context7CompatibleLibraryID\":\"/spinalhdl/spinaldoc-rtd\",\n\"tokens\":\"15000\"\n}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        2580,
+        1000
+      ],
+      "id": "bc28bf8e-7148-488a-bf94-cf45eb09a32c",
+      "name": "MCP Client1",
+      "credentials": {
+        "mcpClientSseApi": {
+          "id": "arGN7me0FbYe3j7R",
+          "name": "context7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "connectionType": "sse"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        1000
+      ],
+      "id": "504c0c83-3533-449d-81f7-3c2b7d5e5243",
+      "name": "MCP Client",
+      "credentials": {
+        "mcpClientSseApi": {
+          "id": "arGN7me0FbYe3j7R",
+          "name": "context7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## LLM及MCP调用\n",
+        "height": 420,
+        "width": 580,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2200,
+        720
+      ],
+      "typeVersion": 1,
+      "id": "7fc25688-f2e5-4809-a6df-124375486fd8",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 代码及log保存\n",
+        "height": 420,
+        "width": 640,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2800,
+        720
+      ],
+      "typeVersion": 1,
+      "id": "677b7ee2-1334-461f-b3bd-23ec33b3b7bf",
+      "name": "Sticky Note2"
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Write Scala Files to Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Prompt1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create fold": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Prompt Files": {
+      "main": [
+        [
+          {
+            "node": "create fold",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Execute workflow": {
+      "main": [
+        [
+          {
+            "node": "Read Prompt Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Prompt from File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit log": {
+      "main": [
+        [
+          {
+            "node": "Write Log Files to Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Extract Prompt from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Log Files to Disk1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Write Scala Files to Disk": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Prompt1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "484a2531ad5e96f3d31aeffb8ae7fe9fd56be4c347bc07ae67078545f900de1b"
+  }
+}

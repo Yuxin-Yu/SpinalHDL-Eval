@@ -146,22 +146,16 @@ export OPENROUTER_API_KEY="你的-api-密钥"
 
 #### 生成单个问题代码
 ```bash
-# 使用高性能模型
+# 使用指定模型测试具体问题
 ./scripts/sv-generate --model gpt-4o \
   --language spinalhdl \
   --task spec-to-rtl \
   --output generated.scala \
   dataset_spec-to-spinalhdl/Prob144_conwaylife_prompt.txt
 
-# 使用免费模型
-./scripts/sv-generate --model deepseek/deepseek-chat-v3-0324:free \
-  --language spinalhdl \
-  --task spec-to-rtl \
-  dataset_spec-to-spinalhdl/Prob001_zero_prompt.txt
-
-# 使用带调试的详细模式
-./scripts/sv-generate --verbose --temperature 0.7 --examples 2 \
-  dataset_spec-to-spinalhdl/Prob079_fsm3onehot_prompt.txt
+# 使用默认模型测试所有问题
+cd build
+make sv-generate LANGUAGE=spinalhdl
 ```
 
 #### 编译生成的代码
